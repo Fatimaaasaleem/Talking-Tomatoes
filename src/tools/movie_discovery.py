@@ -4,6 +4,9 @@ def discover_movies(
     min_rating: float | None = None,
     limit: int = 5
 ) -> list[dict]:
+    #validate genre
+    if genre is not None and (not isinstance(genre, str) or not genre.strip()):
+        raise ValueError("Genre must be a non-empty string.")
 
     # Validate limit
     if not isinstance(limit, int) or isinstance(limit, bool) or limit <= 0:
@@ -23,3 +26,10 @@ def discover_movies(
 
     # Movie discovery logic will go here
     pass
+
+
+
+def list_supported_genres() -> list[str]:
+    # This function would return a list of supported genres
+    # For demonstration purposes, we will return a static list
+    return ["Action", "Comedy", "Drama", "Horror", "Romance", "Sci-Fi", "Thriller"]
