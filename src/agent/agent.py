@@ -1,14 +1,31 @@
-
 import json
 
 from src.agent.tool_executor import execute_tool
-from src.tools.tool_schemas import SUPPORTED_GENRES_TOOL
+from src.tools.tool_schemas import (
+    SUPPORTED_GENRES_TOOL,
+    SEARCH_MOVIE_TOOL,
+    SEARCH_TV_TOOL,
+    DISCOVER_MOVIES_TOOL,
+    DISCOVER_TV_TOOL,
+    GET_MOVIE_DETAILS_TOOL,
+    GET_TV_DETAILS_TOOL,
+    GET_SIMILAR_MOVIES_TOOL,
+    GET_SIMILAR_TV_TOOL
+)
 
 
 MAX_ITERATIONS = 5
 
 AVAILABLE_SCHEMAS = [
-    SUPPORTED_GENRES_TOOL
+    SUPPORTED_GENRES_TOOL,
+    SEARCH_MOVIE_TOOL,
+    SEARCH_TV_TOOL,
+    DISCOVER_MOVIES_TOOL,
+    DISCOVER_TV_TOOL,
+    GET_MOVIE_DETAILS_TOOL,
+    GET_TV_DETAILS_TOOL,
+    GET_SIMILAR_MOVIES_TOOL,
+    GET_SIMILAR_TV_TOOL
 ]
 
 
@@ -25,7 +42,7 @@ def run_agent(client, messages):
 
         message = response.choices[0].message
 
-        # If no tools are requested, return the final response
+        # Return if the model has finished responding
         if not message.tool_calls:
 
             messages.append({
