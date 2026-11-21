@@ -187,3 +187,261 @@ DISCOVER_TV_TOOL = {
         }
     }
 }
+GET_USER_PREFERENCES_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "get_user_preferences",
+        "description": "Retrieves the current user's language, minimum rating, liked genres, and disliked genres.",
+        "parameters": {
+            "type": "object",
+            "properties": {},
+            "required": []
+        }
+    }
+}
+
+
+GET_USER_LIBRARY_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "get_user_library",
+        "description": "Retrieves titles from the current user's personal library. Can filter by status, media type, or favourite status.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "enum": [
+                        "watchlist",
+                        "watching",
+                        "completed",
+                        "dropped"
+                    ],
+                    "description": "Optional library status filter."
+                },
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"],
+                    "description": "Optional media type filter."
+                },
+                "is_favourite": {
+                    "type": "boolean",
+                    "description": "Filter by favourite status."
+                }
+            },
+            "required": []
+        }
+    }
+}
+
+
+GET_USER_VIEWING_HISTORY_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "get_user_viewing_history",
+        "description": "Retrieves the current user's viewing history, including watched titles and ratings.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"],
+                    "description": "Optional media type filter."
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of history records to retrieve. Defaults to 20."
+                }
+            },
+            "required": []
+        }
+    }
+}
+# ==========================================
+# DATABASE WRITE TOOLS
+# ==========================================
+
+UPDATE_USER_PREFERENCES_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "update_user_preferences",
+        "description": "Updates the current user's language and minimum rating preference.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "language": {"type": "string"},
+                "min_rating": {"type": "number"}
+            },
+            "required": []
+        }
+    }
+}
+
+ADD_USER_GENRE_PREFERENCE_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "add_user_genre_preference",
+        "description": "Adds a genre to the user's liked or disliked genres.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "genre": {"type": "string"},
+                "preference_type": {
+                    "type": "string",
+                    "enum": ["liked", "disliked"]
+                }
+            },
+            "required": ["genre", "preference_type"]
+        }
+    }
+}
+
+REMOVE_USER_GENRE_PREFERENCE_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "remove_user_genre_preference",
+        "description": "Removes a genre from the user's liked or disliked genres.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "genre": {"type": "string"},
+                "preference_type": {
+                    "type": "string",
+                    "enum": ["liked", "disliked"]
+                }
+            },
+            "required": ["genre", "preference_type"]
+        }
+    }
+}
+
+ADD_USER_LIBRARY_ENTRY_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "add_user_library_entry",
+        "description": "Adds a movie or TV show to the user's library.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"]
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["watchlist", "watching", "completed", "dropped"]
+                },
+                "current_season": {"type": "integer"},
+                "current_episode": {"type": "integer"}
+            },
+            "required": ["tmdb_id", "media_type"]
+        }
+    }
+}
+
+UPDATE_USER_LIBRARY_STATUS_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "update_user_library_status",
+        "description": "Changes the status of a title in the user's library.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"]
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["watchlist", "watching", "completed", "dropped"]
+                }
+            },
+            "required": ["tmdb_id", "media_type", "status"]
+        }
+    }
+}
+
+UPDATE_USER_FAVOURITE_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "update_user_favourite",
+        "description": "Marks a title as a favourite or removes its favourite status.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"]
+                },
+                "is_favourite": {"type": "boolean"}
+            },
+            "required": ["tmdb_id", "media_type", "is_favourite"]
+        }
+    }
+}
+
+REMOVE_USER_LIBRARY_ENTRY_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "remove_user_library_entry",
+        "description": "Removes a movie or TV show from the user's library.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"]
+                }
+            },
+            "required": ["tmdb_id", "media_type"]
+        }
+    }
+}
+
+UPDATE_USER_VIEWING_PROGRESS_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "update_user_viewing_progress",
+        "description": "Updates the user's current season and episode for a TV show.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "current_season": {"type": "integer"},
+                "current_episode": {"type": "integer"}
+            },
+            "required": [
+                "tmdb_id",
+                "current_season",
+                "current_episode"
+            ]
+        }
+    }
+}
+
+RECORD_USER_VIEWING_HISTORY_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "record_user_viewing_history",
+        "description": "Records a movie or TV show in the user's viewing history, optionally with a rating.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"]
+                },
+                "rating": {
+                    "type": "number",
+                    "description": "Optional rating."
+                }
+            },
+            "required": ["tmdb_id", "media_type"]
+        }
+    }
+}
