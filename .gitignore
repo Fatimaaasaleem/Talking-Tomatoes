@@ -1,1 +1,31 @@
+# Environment variables and API secrets
 .env
+.env.*
+!.env.example
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Pytest
+.pytest_cache/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# AI coding assistant files
+.agents/
+.claude/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
