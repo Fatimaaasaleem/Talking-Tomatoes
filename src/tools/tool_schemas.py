@@ -257,6 +257,24 @@ GET_USER_VIEWING_HISTORY_TOOL = {
         }
     }
 }
+GET_USER_RECOMMENDATION_FEEDBACK_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "get_user_recommendation_feedback",
+        "description": "Retrieves the current user's feedback on recommended movies and TV shows.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "feedback_type": {
+                    "type": "string",
+                    "enum": ["liked", "disliked", "not_interested"],
+                    "description": "Optional feedback category filter."
+                }
+            },
+            "required": []
+        }
+    }
+}
 # ==========================================
 # DATABASE WRITE TOOLS
 # ==========================================
@@ -442,6 +460,81 @@ RECORD_USER_VIEWING_HISTORY_TOOL = {
                 }
             },
             "required": ["tmdb_id", "media_type"]
+        }
+    }
+}
+RECORD_RECOMMENDATION_FEEDBACK_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "record_recommendation_feedback",
+        "description": "Records or updates the current user's feedback on a movie or TV show.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"]
+                },
+                "feedback": {
+                    "type": "string",
+                    "enum": ["liked", "disliked", "not_interested"]
+                }
+            },
+            "required": ["tmdb_id", "media_type", "feedback"]
+        }
+    }
+}
+
+
+REMOVE_USER_RECOMMENDATION_FEEDBACK_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "remove_user_recommendation_feedback",
+        "description": "Removes the current user's feedback for a movie or TV show.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "tmdb_id": {"type": "integer"},
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"]
+                }
+            },
+            "required": ["tmdb_id", "media_type"]
+        }
+    }
+}
+# ==========================================
+# PERSONALIZED RECOMMENDATIONS
+# ==========================================
+
+GET_PERSONALIZED_RECOMMENDATIONS_TOOL = {
+    "type": "function",
+    "function": {
+        "name": "get_personalized_recommendations",
+        "description": (
+            "Generates personalized movie or TV recommendations "
+            "based on the current user's liked and disliked genres, "
+            "minimum rating preference, personal library, and "
+            "previous recommendation feedback. Excludes titles "
+            "already in the user's library and titles they have "
+            "disliked or marked as not interested."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "media_type": {
+                    "type": "string",
+                    "enum": ["movie", "tv"],
+                    "description": "Whether to recommend movies or TV shows. Defaults to movie."
+                },
+                "limit": {
+                    "type": "integer",
+                    "description": "Maximum number of recommendations to return, between 1 and 20. Defaults to 5."
+                }
+            },
+            "required": []
         }
     }
 }

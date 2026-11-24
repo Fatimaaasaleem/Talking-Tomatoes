@@ -19,6 +19,9 @@ from src.database.operations import (
     add_viewing_history,
     get_viewing_history,
     set_library_favourite,
+    save_recommendation_feedback,
+get_recommendation_feedback,
+remove_recommendation_feedback,
 )
 
 
@@ -239,3 +242,101 @@ def test_adding_existing_tv_show_preserves_progress(test_db):
     assert library[0]["current_season"] == 2
     assert library[0]["current_episode"] == 5
     
+    
+    
+def test_save_and_get_recommendation_feedback(test_db):
+    user_id = create_user("feedback_user")
+
+    result = save_recommendation_feedback(
+        user_id, 550, "movie", "liked"
+    )
+
+    assert result is True
+
+    feedback = get_recommendation_feedback(user_id)
+
+    assert len(feedback) == 1
+    assert feedback[0]["tmdb_id"] == 550
+    assert feedback[0]["feedback"] == "liked"
+
+
+def test_update_recommendation_feedback(test_db):
+    user_id = create_user("update_feedback_user")
+
+    save_recommendation_feedback(
+        user_id, 550, "movie", "liked"
+    )
+
+    save_recommendation_feedback(
+        user_id, 550, "movie", "disliked"
+    )
+
+    feedback = get_recommendation_feedback(user_id)
+
+    assert len(feedback) == 1
+    assert feedback[0]["feedback"] == "disliked"
+
+
+def test_filter_recommendation_feedback(test_db):
+    user_id = create_user("filter_feedback_user")
+
+    save_recommendation_feedback(
+        user_id, 550, "movie", "liked"
+    )
+
+    save_recommendation_feedback(
+        user_id, 1396, "tv", "disliked"
+    )
+
+    liked = get_recommendation_feedback(
+        user_id, "liked"
+    )
+
+    assert len(liked) == 1
+    assert liked[0]["tmdb_id"] == 550
+
+
+def test_remove_recommendation_feedback(test_db):
+    user_id = create_user("remove_feedback_user")
+
+    save_recommendation_feedback(
+        user_id, 550, "movie", "liked"
+    )
+
+    result = remove_recommendation_feedback(
+        user_id, 550, "movie"
+    )
+
+    assert result is True
+    assert get_recommendation_feedback(user_id) == []
+
+    result = remove_recommendation_feedback(
+        user_id, 550, "movie"
+    )
+
+    assert result is False
+
+
+def test_recommendation_feedback_validation(test_db):
+    user_id = create_user("validation_feedback_user")
+
+    with pytest.raises(ValueError):
+        save_recommendation_feedback(
+            user_id, 550, "movie", "maybe"
+        )
+
+    with pytest.raises(ValueError):
+        save_recommendation_feedback(
+            -1, 550, "movie", "liked"
+        )    
+    
+    
+def test_recommendation_feedback_is_user_specific(test_db):
+    user_one = create_user("feedback_owner")
+    user_two = create_user("other_user")
+
+    save_recommendation_feedback(
+        user_one, 550, "movie", "liked"
+    )
+
+    assert get_recommendation_feedback(user_two) == []    

@@ -12,6 +12,9 @@ from src.database.operations import (
     remove_from_library,
     update_viewing_progress,
     add_viewing_history,
+    get_recommendation_feedback,
+save_recommendation_feedback,
+remove_recommendation_feedback,
 )
 
 
@@ -191,3 +194,45 @@ def record_user_viewing_history(
         "success": True,
         "history_id": history_id
     }
+    
+# ==========================================
+# RECOMMENDATION FEEDBACK TOOLS
+# ==========================================
+
+def get_user_recommendation_feedback(user_id, feedback_type=None):
+    """Retrieve a user's recommendation feedback."""
+
+    return get_recommendation_feedback(
+        user_id=user_id,
+        feedback_type=feedback_type
+    )
+
+
+def record_recommendation_feedback(
+    user_id,
+    tmdb_id,
+    media_type,
+    feedback
+):
+    """Record or update a user's feedback on a title."""
+
+    result = save_recommendation_feedback(
+        user_id=user_id,
+        tmdb_id=tmdb_id,
+        media_type=media_type,
+        feedback=feedback
+    )
+
+    return {"success": result}
+
+
+def remove_user_recommendation_feedback(user_id, tmdb_id, media_type):
+    """Remove a user's feedback for a title."""
+
+    result = remove_recommendation_feedback(
+        user_id=user_id,
+        tmdb_id=tmdb_id,
+        media_type=media_type
+    )
+
+    return {"success": result}    

@@ -12,6 +12,10 @@ from src.tools.movie_discovery import (
     get_similar_tv
 )
 
+from src.tools.recommendations import (
+    get_personalized_recommendations
+)
+
 from src.tools.database_tools import (
     get_user_preferences,
     get_user_library,
@@ -24,7 +28,10 @@ from src.tools.database_tools import (
     update_user_favourite,
     remove_user_library_entry,
     update_user_viewing_progress,
-    record_user_viewing_history
+    record_user_viewing_history,
+    get_user_recommendation_feedback,
+    record_recommendation_feedback,
+    remove_user_recommendation_feedback
 )
 
 from src.agent.confirmation import (
@@ -34,7 +41,12 @@ from src.agent.confirmation import (
 )
 
 
+# ==========================================
+# AVAILABLE TOOLS
+# ==========================================
+
 AVAILABLE_TOOLS = {
+    # TMDB tools
     "list_supported_genres": list_supported_genres,
     "search_movie": search_movie,
     "search_tv": search_tv,
@@ -45,10 +57,16 @@ AVAILABLE_TOOLS = {
     "get_similar_movies": get_similar_movies,
     "get_similar_tv": get_similar_tv,
 
+    # Recommendation tools
+    "get_personalized_recommendations": get_personalized_recommendations,
+
+    # Database read tools
     "get_user_preferences": get_user_preferences,
     "get_user_library": get_user_library,
     "get_user_viewing_history": get_user_viewing_history,
+    "get_user_recommendation_feedback": get_user_recommendation_feedback,
 
+    # Database write tools
     "update_user_preferences": update_user_preferences,
     "add_user_genre_preference": add_user_genre_preference,
     "remove_user_genre_preference": remove_user_genre_preference,
@@ -58,13 +76,22 @@ AVAILABLE_TOOLS = {
     "remove_user_library_entry": remove_user_library_entry,
     "update_user_viewing_progress": update_user_viewing_progress,
     "record_user_viewing_history": record_user_viewing_history,
+    "record_recommendation_feedback": record_recommendation_feedback,
+    "remove_user_recommendation_feedback": remove_user_recommendation_feedback
 }
 
+
+# ==========================================
+# DATABASE TOOLS
+# ==========================================
 
 DATABASE_TOOLS = {
     "get_user_preferences",
     "get_user_library",
     "get_user_viewing_history",
+    "get_user_recommendation_feedback",
+    "get_personalized_recommendations",
+
     "update_user_preferences",
     "add_user_genre_preference",
     "remove_user_genre_preference",
@@ -74,8 +101,14 @@ DATABASE_TOOLS = {
     "remove_user_library_entry",
     "update_user_viewing_progress",
     "record_user_viewing_history",
+    "record_recommendation_feedback",
+    "remove_user_recommendation_feedback"
 }
 
+
+# ==========================================
+# WRITE TOOLS
+# ==========================================
 
 WRITE_TOOLS = {
     "update_user_preferences",
@@ -87,8 +120,14 @@ WRITE_TOOLS = {
     "remove_user_library_entry",
     "update_user_viewing_progress",
     "record_user_viewing_history",
+    "record_recommendation_feedback",
+    "remove_user_recommendation_feedback"
 }
 
+
+# ==========================================
+# TOOL EXECUTION
+# ==========================================
 
 def execute_tool(tool_call, user_id=None):
     """Execute read tools or create a pending database action."""
@@ -106,7 +145,9 @@ def execute_tool(tool_call, user_id=None):
             raise ValueError("Tool arguments must be a JSON object.")
 
     except json.JSONDecodeError as error:
-        raise ValueError("Invalid JSON arguments received from the LLM.") from error
+        raise ValueError(
+            "Invalid JSON arguments received from the LLM."
+        ) from error
 
     # The application, not the LLM, determines the user.
     if function_name in DATABASE_TOOLS:
@@ -127,7 +168,11 @@ def execute_tool(tool_call, user_id=None):
             "action_id": action_id,
             "tool_name": function_name,
             "arguments": arguments,
-            "message": "This action requires explicit user confirmation. Do not execute it again. Explain the proposed action and ask the user to confirm."
+            "message": (
+                "This action requires explicit user confirmation. "
+                "Do not execute it again. Explain the proposed action "
+                "and ask the user to confirm."
+            )
         })
 
     # Execute read operations immediately.
@@ -138,6 +183,10 @@ def execute_tool(tool_call, user_id=None):
 
     return json.dumps(result)
 
+
+# ==========================================
+# ACTION CONFIRMATION
+# ==========================================
 
 def confirm_pending_action(user_id, action_id):
     """Execute a pending action after application-level confirmation."""
@@ -194,4 +243,5 @@ def cancel_pending_action(user_id):
         return False
 
     clear_pending_action(user_id)
+
     return True

@@ -94,6 +94,32 @@ def create_tables():
                 CHECK (rating IS NULL OR (rating >= 0 AND rating <= 10))
             )
         """)
+                # 6. Recommendation feedback table
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS recommendation_feedback (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                tmdb_id INTEGER NOT NULL,
+                media_type TEXT NOT NULL,
+                feedback TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+                FOREIGN KEY (user_id) REFERENCES users(id)
+                    ON DELETE CASCADE,
+
+                CHECK (media_type IN ('movie', 'tv')),
+
+                CHECK (
+                    feedback IN (
+                        'liked',
+                        'disliked',
+                        'not_interested'
+                    )
+                ),
+
+                UNIQUE (user_id, tmdb_id, media_type)
+            )
+        """)
 
         # Migrate existing library tables.
         columns = {

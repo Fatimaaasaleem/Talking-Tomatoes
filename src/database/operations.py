@@ -679,5 +679,155 @@ def get_viewing_history(user_id, media_type=None, limit=20):
         ]
 
     finally:
-        connection.close()        
+        connection.close()  
+        
+        
+        
+# ==========================================
+# RECOMMENDATION FEEDBACK OPERATIONS
+# ==========================================
+
+VALID_RECOMMENDATION_FEEDBACK = (
+    "liked",
+    "disliked",
+    "not_interested"
+)
+
+
+def save_recommendation_feedback(
+    user_id,
+    tmdb_id,
+    media_type,
+    feedback
+):
+    """Save or update a user's feedback on a recommendation."""
+
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+        raise ValueError("user_id must be a positive integer.")
+
+    if not isinstance(tmdb_id, int) or isinstance(tmdb_id, bool) or tmdb_id <= 0:
+        raise ValueError("tmdb_id must be a positive integer.")
+
+    if media_type not in VALID_MEDIA_TYPES:
+        raise ValueError("media_type must be 'movie' or 'tv'.")
+
+    if feedback not in VALID_RECOMMENDATION_FEEDBACK:
+        raise ValueError("Invalid recommendation feedback.")
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            INSERT INTO recommendation_feedback (
+                user_id,
+                tmdb_id,
+                media_type,
+                feedback
+            )
+            VALUES (?, ?, ?, ?)
+
+            ON CONFLICT(user_id, tmdb_id, media_type)
+            DO UPDATE SET
+                feedback = excluded.feedback,
+                created_at = CURRENT_TIMESTAMP
+        """, (
+            user_id,
+            tmdb_id,
+            media_type,
+            feedback
+        ))
+
+        connection.commit()
+
+        return True
+
+    finally:
+        connection.close()              
+        
+        
+def get_recommendation_feedback(user_id, feedback_type=None):
+    """Retrieve a user's recommendation feedback."""
+
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+        raise ValueError("user_id must be a positive integer.")
+
+    if (
+        feedback_type is not None
+        and feedback_type not in VALID_RECOMMENDATION_FEEDBACK
+    ):
+        raise ValueError("Invalid feedback type.")
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.cursor()
+
+        query = """
+            SELECT
+                tmdb_id,
+                media_type,
+                feedback,
+                created_at
+            FROM recommendation_feedback
+            WHERE user_id = ?
+        """
+
+        parameters = [user_id]
+
+        if feedback_type is not None:
+            query += " AND feedback = ?"
+            parameters.append(feedback_type)
+
+        query += " ORDER BY created_at DESC"
+
+        cursor.execute(query, parameters)
+
+        results = cursor.fetchall()
+
+        return [
+            {
+                "tmdb_id": row[0],
+                "media_type": row[1],
+                "feedback": row[2],
+                "created_at": row[3]
+            }
+            for row in results
+        ]
+
+    finally:
+        connection.close()     
+        
+def remove_recommendation_feedback(user_id, tmdb_id, media_type):
+    """Remove a user's feedback for a specific title."""
+
+    if not isinstance(user_id, int) or isinstance(user_id, bool) or user_id <= 0:
+        raise ValueError("user_id must be a positive integer.")
+
+    if not isinstance(tmdb_id, int) or isinstance(tmdb_id, bool) or tmdb_id <= 0:
+        raise ValueError("tmdb_id must be a positive integer.")
+
+    if media_type not in VALID_MEDIA_TYPES:
+        raise ValueError("media_type must be 'movie' or 'tv'.")
+
+    connection = get_connection()
+
+    try:
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            DELETE FROM recommendation_feedback
+            WHERE user_id = ?
+            AND tmdb_id = ?
+            AND media_type = ?
+        """, (user_id, tmdb_id, media_type))
+
+        connection.commit()
+
+        return cursor.rowcount > 0
+
+    finally:
+        connection.close()           
+        
         

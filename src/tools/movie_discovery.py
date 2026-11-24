@@ -1,4 +1,3 @@
-
 from src.services.tmdb_client import TMDBClient
 
 
@@ -42,6 +41,7 @@ def search_movie(query: str, limit: int = 5) -> list[dict]:
             "release_date": movie.get("release_date"),
             "overview": movie.get("overview"),
             "rating": movie.get("vote_average"),
+            "poster_path": movie.get("poster_path"),
             "genre_ids": movie.get("genre_ids", [])
         })
 
@@ -75,6 +75,7 @@ def search_tv(query: str, limit: int = 5) -> list[dict]:
             "first_air_date": show.get("first_air_date"),
             "overview": show.get("overview"),
             "rating": show.get("vote_average"),
+            "poster_path": show.get("poster_path"),
             "genre_ids": show.get("genre_ids", [])
         })
 
@@ -159,6 +160,7 @@ def discover_movies(
             "release_date": movie.get("release_date"),
             "overview": movie.get("overview"),
             "rating": movie.get("vote_average"),
+            "poster_path": movie.get("poster_path"),
             "genre_ids": movie.get("genre_ids", [])
         })
 
@@ -185,6 +187,7 @@ def get_tv_details(tv_id: int) -> dict:
         "last_air_date": show.get("last_air_date"),
         "overview": show.get("overview"),
         "rating": show.get("vote_average"),
+        "poster_path": show.get("poster_path"),
         "number_of_seasons": show.get("number_of_seasons"),
         "number_of_episodes": show.get("number_of_episodes"),
         "episode_run_time": show.get("episode_run_time", []),
@@ -215,6 +218,7 @@ def get_movie_details(movie_id: int) -> dict:
         "release_date": movie.get("release_date"),
         "overview": movie.get("overview"),
         "rating": movie.get("vote_average"),
+        "poster_path": movie.get("poster_path"),
         "runtime": movie.get("runtime"),
         "genres": [
             genre["name"]
@@ -255,6 +259,7 @@ def get_similar_movies(movie_id: int, limit: int = 5) -> list[dict]:
             "release_date": movie.get("release_date"),
             "overview": movie.get("overview"),
             "rating": movie.get("vote_average"),
+            "poster_path": movie.get("poster_path"),
             "genre_ids": movie.get("genre_ids", [])
         })
 
@@ -281,6 +286,7 @@ def get_similar_tv(tv_id, limit=5):
             "first_air_date": show.get("first_air_date"),
             "overview": show.get("overview"),
             "rating": show.get("vote_average"),
+            "poster_path": show.get("poster_path"),
             "genre_ids": show.get("genre_ids", [])
         }
         for show in data.get("results", [])[:limit]
@@ -330,7 +336,9 @@ def discover_tv(genre=None, year=None, min_rating=None, limit=5):
             "first_air_date": show.get("first_air_date"),
             "overview": show.get("overview"),
             "rating": show.get("vote_average"),
+            "poster_path": show.get("poster_path"),
             "genre_ids": show.get("genre_ids", [])
         }
         for show in data.get("results", [])[:limit]
     ]
+    
